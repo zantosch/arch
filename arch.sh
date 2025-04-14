@@ -100,6 +100,14 @@ HOSTS
 pacman-key --init
 #pacman-key --refresh-keys
 pacman-key --populate archlinux
+
+# ENABLE EXTRA AND MULTILIB REPOS
+sed -i '/\[extra\]/,/Include/s/^#//' /etc/pacman.conf
+
+sed -i '/multilib/s/^#//' /etc/pacman.conf
+sed -i '/^multilib/,/^$/s/^#Include.*/\1/' /etc/pacman.conf
+
+
 pacman -Syu --noconfirm
 pacman -S --noconfirm linux linux-headers linux-lts linux-lts-headers linux-firmware nano base-devel openssh networkmanager wpa_supplicant wireless_tools netctl dialog lvm2 grub efibootmgr dosfstools os-prober mtools mesa
 
@@ -143,10 +151,6 @@ chown -R zantos:zantos /home/zantos
 
 # CREATE USER HOME DIRECTORIES
 sudo -u zantos mkdir -p /home/zantos/{Applications/scripts,Applications/vpn,Downloads,Pictures/wallpapers,Videos,Documents,.fonts,.config/rofi,.config/REAPER/KeyMaps}
-
-# ENABLE EXTRA AND MULTILIB REPOS
-sed -i '/\[multilib\]/,/Include/s/^#//' /etc/pacman.conf
-sed -i '/\[extra\]/,/Include/s/^#//' /etc/pacman.conf
 
 # INSTALL DESKTOP APPLICATIONS (non-fatal)
 pacman -S --noconfirm gnome-keyring gvfs udisks2 ufw nm-connection-editor network-manager-applet pavucontrol pulseaudio bluez bluez-utils blueman gtk-engine-murrine gtk-engines sass keepassxc rofi git bleachbit signal-desktop audacity psensor htop speedtest-cli pdfarranger krita qbittorrent handbrake kdenlive mixxx obs-studio soundconverter digikam cheese ibus-hangul lsscsi fastfetch noto-fonts hdparm acpi mpv hwinfo procinfo tmux nload cmus cmake reaper homebank obsidian yubikey-manager android-tools retroarch steam supertuxkart supertux flatpak timeshift grsync vlc libreoffice audacious redshift pcmanfm xarchiver p7zip lxappearance hddtemp rdfind alsa-utils brightnessctl inxi slock xf86-video-intel flameshot dunst mupdf mednafen || echo "Some desktop packages failed to install. Continuing..."
