@@ -11,7 +11,7 @@ systemctl enable systemd-timesyncd.service
 
 # INITIALIZE KEYS
 pacman-key --init
-pacman-key --refresh-keys
+#pacman-key --refresh-keys
 pacman-key --populate archlinux
 
 # DISK WIPE AND PARTITION (Warning: this will destroy all data on /dev/nvme0n1)
@@ -48,8 +48,8 @@ cryptsetup open --type luks $lvm_part lvm
 pvcreate --dataalignment 1m /dev/mapper/lvm
 vgcreate volgroup0 /dev/mapper/lvm
 lvcreate -L 150G volgroup0 -n lv_root
-lvcreate -l 80%FREE volgroup0 -n lv_home
 lvcreate -L 21G volgroup0 -n lv_swap
+lvcreate -l 99%FREE volgroup0 -n lv_home
 modprobe dm_mod
 vgscan
 vgchange -ay
@@ -85,14 +85,6 @@ pacstrap -i /mnt base
 [ -d /mnt/etc ] || { echo "pacstrap failed. /mnt/etc not found. Aborting."; exit 1; }
 
 # CHROOT SETUP
- > /mnt/etc/greetd/config.toml
-[terminal]
-vt = 1
-
-[default_session]
-command = "sway"
-user = "zantos"
-CFG
 arch-chroot /mnt /bin/bash <<EOF
 
 # SET TIMEZONE, HOSTNAME, AND HOSTS INSIDE CHROOT
@@ -106,7 +98,7 @@ cat <<HOSTS > /etc/hosts
 HOSTS
 
 pacman-key --init
-pacman-key --refresh-keys
+#pacman-key --refresh-keys
 pacman-key --populate archlinux
 pacman -Syu --noconfirm
 pacman -S --noconfirm linux linux-headers linux-lts linux-lts-headers linux-firmware nano base-devel openssh networkmanager wpa_supplicant wireless_tools netctl dialog lvm2 grub efibootmgr dosfstools os-prober mtools mesa
@@ -192,22 +184,26 @@ systemctl enable bluetooth.service
 ufw enable
 
 # INSTALL QOGIR THEME AND ICONS
-cd /home/zantos
+sudo -u zantos bash -c "
+cd ~
 git clone https://github.com/vinceliuice/Qogir-theme
 cd Qogir-theme
 ./install.sh
-cd /home/zantos
+cd ~
 git clone https://github.com/vinceliuice/Qogir-icon-theme
 cd Qogir-icon-theme
 ./install.sh
+"
 
 # INSTALL YAY (AUR HELPER)
-cd /home/zantos
+sudo -u zantos bash -c "
+cd ~
 git clone https://aur.archlinux.org/yay.git
 cd yay
 makepkg -si --noconfirm
+"
 
-yay -S brave-bin
+sudo -u zantos yay -S brave-bin --noconfirm
 
 EOF
 
